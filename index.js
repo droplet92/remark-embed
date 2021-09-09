@@ -1,10 +1,19 @@
-module.exports = remarkYoutubeEmbed;
+import { visit } from 'unist-util-visit';
 
-var visit = require("unist-util-visit");
+const regexps = [
+  {
+    regex: /^\!\(((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?\)$/,
+    embedUrl: "https://www.youtube.com/embed/",
+    idIndex: 5,
+  },
+  {
+    regex: /\!\((?:<iframe.+?src=")?.*?(?=((?:https?:)?\/\/)?((?:www)\.)?((?:slideshare\.net))(\/(?:[\w\-]+\/embed_code\/key\/)?)([\w\-]+(\S+)?[\?"])).*\)/,
+    embedUrl: "https://www.slideshare.net/slideshow/embed_code/key/",
+    idIndex: 5,
+  },
+]
 
-var regex = /\!\(http.*youtube.com.*?v=(.*)\)/;
-
-function remarkYoutubeEmbed() {
+function remarkEmbed() {
   return transform;
 }
 
@@ -13,26 +22,34 @@ function transform(tree) {
 }
 
 function ontext(node, index, parent) {
-  const match = regex.exec(node.value);
+  let match = null
+  let iframe = null
 
-  if (!match) return;
+  regexps.forEach(iter => {
+    match = iter.regex.exec(node.value)
 
-  const videoid = match[1];
+    if (match) {
+      iframe = makeIframe(iter.embedUrl, match[iter.idIndex])
+      parent.children.splice(index, 1, iframe);
+    }
+  })
+}
 
-  const iframe = {
+function makeIframe(embedUrl, videoid) {
+  return {
     type: "iframe",
     data: {
       hName: "iframe",
       hProperties: {
-        videoid: videoid,
-        src: `https://www.youtube.com/embed/${videoid}`,
-        width: 560,
+        videoid,
+        src: embedUrl + videoid,
+        width: '100%',
         height: 315,
         allowfullscreen: true,
         frameborder: "0",
       },
     },
   };
-
-  parent.children.splice(index, 1, iframe);
 }
+
+export default remarkEmbed;
