@@ -7,11 +7,11 @@ const regexps = [
     idIndex: 5,
   },
   {
-    regex: /\!\((?:<iframe.+?src=")?.*?(?=((?:https?:)?\/\/)?((?:www)\.)?((?:slideshare\.net))(\/(?:[\w\-]+\/embed_code\/key\/)?)([\w\-]+(\S+)?[\?"])).*\)/,
+    regex: /\!\(((?:https?:)?\/\/)?((?:www)\.)?((?:slideshare\.net))(\/(?:[\w\-]+\/embed_code\/key\/)?)([\w\-]+(\S+)?)\)/,
     embedUrl: "https://www.slideshare.net/slideshow/embed_code/key/",
     idIndex: 5,
   },
-]
+];
 
 function remarkEmbed() {
   return transform;
@@ -22,14 +22,14 @@ function transform(tree) {
 }
 
 function ontext(node, index, parent) {
-  let match = null
-  let iframe = null
+  let match = null;
+  let iframe = null;
 
   regexps.forEach(iter => {
-    match = iter.regex.exec(node.value)
+    match = iter.regex.exec(node.value);
 
     if (match) {
-      iframe = makeIframe(iter.embedUrl, match[iter.idIndex])
+      iframe = makeIframe(iter.embedUrl, match[iter.idIndex]);
       parent.children.splice(index, 1, iframe);
     }
   })
