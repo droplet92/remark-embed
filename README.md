@@ -1,8 +1,6 @@
-![main](https://github.com/kawaPC/remark-youtube-embed/actions/workflows/main.yml/badge.svg?branch=main)
+# remark-embed
 
-# remark-youtube-embed
-
-Remark plugin to support youtube iframe embedding with markdown custom syntax.
+Remark plugin to support iframe embedding with markdown custom syntax.
 
 ## Custom Syntax
 
@@ -15,7 +13,7 @@ Remark plugin to support youtube iframe embedding with markdown custom syntax.
 ```html
 <iframe
   src="https://www.youtube.com/embed/jNQXAC9IVRw"
-  width="560"
+  width="100%"
   height="315"
   allowfullscreen
   frameborder="0"
@@ -29,11 +27,11 @@ import unified from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
-import youtubeEmbed from "remark-youtube-embed";
+import remarkEmbed from "remark-embed";
 
 unified()
   .use(remarkParse)
-  .use(youtubeEmbed)
+  .use(remarkEmbed)
   .use(remarkRehype)
   .use(rehypeStringify)
   .process(markdown);
